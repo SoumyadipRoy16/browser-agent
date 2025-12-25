@@ -27,15 +27,6 @@ A powerful browser automation agent built with Go that provides a web-based inte
 # Create project directory
 mkdir browser-agent
 cd browser-agent
-
-# Initialize Go module
-go mod init browser-agent
-
-# Create directory structure
-mkdir -p cmd/agent
-mkdir -p internal/browser
-mkdir -p internal/server
-mkdir -p web/static
 ```
 
 ### Step 2: Install Dependencies
