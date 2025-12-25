@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Agent Controller</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 Browser Agent Controller</h1>
+            <p class="subtitle">Control browser actions with ease</p>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Status:</span>
+                <span id="status" class="status-value">Ready</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Current URL:</span>
+                <span id="currentUrl" class="status-value">Not navigated</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Navigation</h2>
+            <div class="form-group">
+                <label for="urlInput">Enter URL:</label>
+                <div class="input-group">
+                    <input type="text" id="urlInput" placeholder="https://example.com" value="https://example.com">
+                    <button onclick="navigate()" class="btn btn-primary">Navigate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Basic Actions</h2>
+            <div class="action-grid">
+                <div class="form-group">
+                    <label for="clickSelector">Click Element:</label>
+                    <div class="input-group">
+                        <input type="text" id="clickSelector" placeholder="CSS selector (e.g., button, #id, .class)">
+                        <button onclick="clickElement()" class="btn btn-action">Click</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tapSelector">Tap Element:</label>
+                    <div class="input-group">
+                        <input type="text" id="tapSelector" placeholder="CSS selector">
+                        <button onclick="tapElement()" class="btn btn-action">Tap</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeSelector">Type Text:</label>
+                    <div class="input-group">
+                        <input type="text" id="typeSelector" placeholder="CSS selector">
+                        <input type="text" id="typeText" placeholder="Text to type">
+                        <button onclick="typeText()" class="btn btn-action">Type</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Scroll & Swipe Actions</h2>
+            <div class="action-grid">
+                <div class="form-group">
+                    <label>Scroll Position:</label>
+                    <div class="input-group">
+                        <input type="number" id="scrollX" placeholder="X" value="0" style="width: 80px;">
+                        <input type="number" id="scrollY" placeholder="Y" value="300" style="width: 80px;">
+                        <button onclick="scrollPage()" class="btn btn-action">Scroll</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Quick Scroll:</label>
+                    <div class="btn-group">
+                        <button onclick="quickScroll('up')" class="btn btn-secondary">↑ Up</button>
+                        <button onclick="quickScroll('down')" class="btn btn-secondary">↓ Down</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Swipe:</label>
+                    <div class="btn-group">
+                        <button onclick="swipe('up')" class="btn btn-secondary">⬆ Up</button>
+                        <button onclick="swipe('down')" class="btn btn-secondary">⬇ Down</button>
+                        <button onclick="swipe('left')" class="btn btn-secondary">⬅ Left</button>
+                        <button onclick="swipe('right')" class="btn btn-secondary">➡ Right</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="scrollToSelector">Scroll to Element:</label>
+                    <div class="input-group">
+                        <input type="text" id="scrollToSelector" placeholder="CSS selector">
+                        <button onclick="scrollToElement()" class="btn btn-action">Scroll To</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Advanced Actions</h2>
+            <div class="action-grid">
+                <div class="form-group">
+                    <label for="getTextSelector">Get Element Text:</label>
+                    <div class="input-group">
+                        <input type="text" id="getTextSelector" placeholder="CSS selector">
+                        <button onclick="getElementText()" class="btn btn-action">Get Text</button>
+                    </div>
+                    <div id="textResult" class="result-box"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="scriptInput">Execute JavaScript:</label>
+                    <textarea id="scriptInput" rows="3" placeholder="e.g., document.title"></textarea>
+                    <button onclick="executeScript()" class="btn btn-action">Execute</button>
+                    <div id="scriptResult" class="result-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Screenshot</h2>
+            <button onclick="takeScreenshot()" class="btn btn-primary btn-large">📸 Capture Screenshot</button>
+            <div id="screenshotContainer" class="screenshot-container"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Activity Log</h2>
+            <div id="log" class="log-container"></div>
+            <button onclick="clearLog()" class="btn btn-secondary">Clear Log</button>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
