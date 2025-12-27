@@ -1,256 +1,300 @@
-# Browser Agent - Golang Browser Automation Prototype
+# Autonomous Browser AI Agent
 
-A powerful browser automation agent built with Go that provides a web-based interface for controlling browser actions including clicking, tapping, scrolling, and more.
+A production-ready autonomous browser automation agent that executes natural language tasks end-to-end using AI planning and real browser control.
 
 ## Features
 
-- 🌐 **Browser Control**: Full control over Chrome/Chromium browser
-- 🖱️ **UI Operations**: Click, tap, type, scroll, and swipe actions
-- 📸 **Screenshots**: Capture browser screenshots on demand
-- 🎯 **Element Targeting**: CSS selector-based element interaction
-- 💻 **JavaScript Execution**: Run custom JavaScript in the browser
-- 🎨 **Modern UI**: Clean, responsive web interface
-- 🔄 **Real-time Updates**: Live status monitoring
-- 📝 **Activity Logging**: Track all actions and results
+- **Natural Language Task Execution**: Describe what you want in plain English
+- **Dynamic Planning**: AI-powered task decomposition and execution
+- **Real Browser Control**: Uses Playwright for actual browser automation
+- **Interactive Authentication**: Asks for credentials only when needed
+- **Long Task Support**: Handles 50+ step workflows with progress tracking
+- **Failure Recovery**: Automatic retry and error handling mechanisms
+- **Success Detection**: AI determines when tasks are complete or failed
 
 ## Prerequisites
 
-- Go 1.19 or higher
-- Chrome or Chromium browser installed
-- Git (for cloning the repository)
+- Go 1.21 or higher
+- Gemini API key (free tier available at https://ai.google.dev)
+- Internet connection
 
-## Installation & Setup
+## Installation
 
-### Step 1: Clone and Initialize
+### 1. Clone and Setup
 
 ```bash
-# Create project directory
-mkdir browser-agent
+git clone <repository-url>
 cd browser-agent
+```
 
-# Initialize Go module
+### 2. Initialize Go Module
+
+```bash
 go mod init browser-agent
-
-# Create directory structure
-mkdir -p cmd/agent
-mkdir -p internal/browser
-mkdir -p internal/server
-mkdir -p web/static
 ```
 
-### Step 2: Install Dependencies
+### 3. Install Dependencies
 
 ```bash
-go get github.com/chromedp/chromedp
-go get github.com/gorilla/websocket
-go get github.com/gorilla/mux
+go get github.com/playwright-community/playwright-go@v0.4702.0
+go get golang.org/x/term@latest
 ```
 
-### Step 3: Build the Project
+### 4. Install Playwright Browsers
 
 ```bash
-# Download all dependencies
-go mod tidy
-
-# Build the application
-go build -o browser-agent cmd/agent/main.go
+go run github.com/playwright-community/playwright-go/cmd/playwright@latest install chromium
 ```
 
-## Running the Application
+### 5. Set Environment Variable
 
-### Option 1: Run Directly
 ```bash
-go run cmd/agent/main.go
+export GEMINI_API_KEY="your-gemini-api-key-here"
 ```
 
-### Option 2: Run Built Binary
+Or create a `.env` file:
+```
+GEMINI_API_KEY=your-gemini-api-key-here
+```
+
+## Building
+
 ```bash
-./browser-agent
+go build -o agent cmd/main.go
 ```
-
-The server will start on `http://localhost:8080`
 
 ## Usage
 
-### Web Interface
+### Basic Syntax
 
-1. Open your browser and navigate to `http://localhost:8080`
-2. Enter a URL in the navigation field and click "Navigate"
-3. Use the various action panels to control the browser:
-   - **Basic Actions**: Click, tap, and type on elements
-   - **Scroll & Swipe**: Control page scrolling
-   - **Advanced Actions**: Get element text and execute JavaScript
-   - **Screenshot**: Capture the current browser view
-
-### API Endpoints
-
-#### Navigate to URL
 ```bash
-POST /api/navigate
-Content-Type: application/json
-
-{
-  "url": "https://example.com"
-}
+./agent run "your task description"
 ```
 
-#### Perform Action
-```bash
-POST /api/action
-Content-Type: application/json
+### Example Tasks
 
-{
-  "action": "click",
-  "params": {
-    "selector": "button.submit"
-  }
-}
+#### Simple Task (10-15 steps)
+```bash
+./agent run "Go to google.com and search for weather in San Francisco"
 ```
 
-**Available Actions:**
-- `click` - Click an element
-- `tap` - Tap an element (mobile-like)
-- `type` - Type text into an input
-- `scroll` - Scroll the page
-- `scrollToElement` - Scroll to a specific element
-- `swipe` - Swipe in a direction
-- `getText` - Get element text
-- `executeScript` - Run JavaScript
-
-#### Get Screenshot
+#### Medium Complexity (20-30 steps)
 ```bash
-GET /api/screenshot
+./agent run "Search for best laptops under 1000 dollars on Amazon and tell me the top 3 results with prices"
 ```
 
-#### Get Status
+#### Complex Task (30-50+ steps)
 ```bash
-GET /api/status
+./agent run "Test order placement flow in amazon.com, try to search and place an order for any detergent, go up to payment screen to test if everything until payment is working"
 ```
+
+#### Research Task (40+ steps)
+```bash
+./agent run "Go to Wikipedia, search for artificial intelligence, read the introduction, then navigate to machine learning page and summarize the key differences between supervised and unsupervised learning"
+```
+
+#### Data Extraction (50+ steps)
+```bash
+./agent run "Go to Hacker News, collect the top 10 post titles and their scores, then visit each link and extract the main topic of each article"
+```
+
+## How It Works
+
+### Architecture
+
+```
+┌─────────────────┐
+│  User Command   │
+└────────┬────────┘
+         │
+    ┌────▼─────┐
+    │ Planner  │ (Gemini AI)
+    └────┬─────┘
+         │
+    ┌────▼─────────┐
+    │  Executor    │ (Browser Control)
+    └────┬─────────┘
+         │
+    ┌────▼──────────┐
+    │  Validator    │ (Success Check)
+    └───────────────┘
+```
+
+### Components
+
+1. **Planner Agent**
+   - Decomposes tasks into actionable steps
+   - Understands context and dependencies
+   - Adapts plan based on execution results
+
+2. **Executor Agent**
+   - Controls browser using Playwright
+   - Executes individual actions (click, type, navigate)
+   - Captures screenshots and page state
+   - Handles authentication prompts
+
+3. **Validator Agent**
+   - Determines task completion
+   - Detects failures and suggests recovery
+   - Tracks progress across long workflows
+
+### Long Task Handling
+
+- **Step Limit**: 100 steps maximum (configurable)
+- **Progress Tracking**: Each step is logged with status
+- **Loop Detection**: Prevents infinite repetition
+- **Timeout Management**: Per-step and total timeouts
+- **State Persistence**: Maintains context across steps
+
+### Authentication Flow
+
+When the agent needs credentials:
+
+```
+Agent: I need to log in. Please provide:
+Email: user@example.com
+Password: [hidden input]
+```
+
+Credentials are used immediately and never stored.
+
+## Configuration
+
+Edit `internal/config/config.go` to modify:
+
+- `MaxSteps`: Maximum steps per task (default: 100)
+- `StepTimeout`: Timeout per step (default: 30s)
+- `TotalTimeout`: Maximum total execution time (default: 10m)
+- `Headless`: Browser visibility (default: false for debugging)
 
 ## Project Structure
 
 ```
 browser-agent/
 ├── cmd/
-│   └── agent/
-│       └── main.go              # Application entry point
+│   └── main.go                 # Entry point
 ├── internal/
+│   ├── amazon_agent/
+│   │   ├── agent.go           # Core agent logic
+│   │   ├── planner.go         # Task planning
+│   │   ├── executor.go        # Browser automation
+│   │   └── validator.go       # Success validation
 │   ├── browser/
-│   │   ├── controller.go        # Browser control logic
-│   │   └── actions.go           # Browser action implementations
-│   └── server/
-│       └── server.go            # HTTP server and API handlers
-├── web/
-│   └── static/
-│       ├── index.html           # Web UI
-│       ├── styles.css           # Styling
-│       └── app.js               # Frontend JavaScript
-├── go.mod                       # Go module definition
-├── go.sum                       # Dependency checksums
-└── README.md                    # This file
+│   │   └── browser.go         # Playwright wrapper
+│   ├── llm/
+│   │   └── gemini.go          # Gemini API client
+│   └── config/
+│       └── config.go          # Configuration
+├── go.mod
+├── go.sum
+└── README.md
 ```
 
-## Example Usage
+## Example Execution Log
 
-### Navigate and Click
-```javascript
-// Navigate to a website
-fetch('/api/navigate', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ url: 'https://example.com' })
-});
-
-// Click a button
-fetch('/api/action', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'click',
-    params: { selector: 'button#submit' }
-  })
-});
 ```
-
-### Type Text
-```javascript
-fetch('/api/action', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'type',
-    params: {
-      selector: 'input[name="search"]',
-      text: 'Hello World'
-    }
-  })
-});
+2024-12-27 10:30:00 [INFO] Starting task: Test Amazon order flow
+2024-12-27 10:30:01 [PLAN] Generated 8 initial steps
+2024-12-27 10:30:02 [EXEC] Step 1/8: Navigate to amazon.com
+2024-12-27 10:30:03 [EXEC] Step 2/8: Search for detergent
+2024-12-27 10:30:05 [AUTH] Requesting user email
+2024-12-27 10:30:15 [EXEC] Step 3/8: Click sign in
+2024-12-27 10:30:20 [EXEC] Step 4/8: Select first product
+2024-12-27 10:30:25 [EXEC] Step 5/8: Add to cart
+2024-12-27 10:30:30 [EXEC] Step 6/8: Proceed to checkout
+2024-12-27 10:30:35 [EXEC] Step 7/8: Navigate to payment screen
+2024-12-27 10:30:40 [VALID] Payment screen reached - SUCCESS
+2024-12-27 10:30:40 [INFO] Task completed in 40s (7 steps)
 ```
-
-### Execute JavaScript
-```javascript
-fetch('/api/action', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'executeScript',
-    params: { script: 'return document.title;' }
-  })
-});
-```
-
-## Development
-
-### Adding New Actions
-
-1. Add the action method in `internal/browser/actions.go`
-2. Add the API handler case in `internal/server/server.go`
-3. Update the frontend in `web/static/app.js` and `index.html`
-
-### Debugging
-
-The application logs all activities to the console. Use the browser developer tools to debug frontend issues.
 
 ## Troubleshooting
 
-### Chrome/Chromium Not Found
-Ensure Chrome or Chromium is installed and accessible in your system PATH.
-
-### Port Already in Use
-Change the port in `cmd/agent/main.go`:
-```go
-srv := server.NewServer(browserCtrl, ":8081")
+### Browser doesn't open
+```bash
+go run github.com/playwright-community/playwright-go/cmd/playwright@latest install chromium
 ```
 
-### Dependencies Not Found
-Run `go mod tidy` to download all required dependencies.
+### API Key Issues
+Verify your key:
+```bash
+echo $GEMINI_API_KEY
+```
 
-## Safety & Limitations
+### Timeout Errors
+Increase timeouts in `config.go`:
+```go
+StepTimeout: 60 * time.Second
+TotalTimeout: 15 * time.Minute
+```
 
-- This is a prototype for development/testing purposes
-- Be cautious when automating interactions with websites
-- Respect robots.txt and website terms of service
-- Rate limiting is not implemented - use responsibly
+### Rate Limiting
+Gemini free tier: 15 requests/minute. The agent handles this automatically with exponential backoff.
 
-## Future Enhancements
+## Advanced Usage
 
-- [ ] Multiple browser instances
-- [ ] Session management
-- [ ] Network interception
-- [ ] File upload/download
-- [ ] Cookie management
-- [ ] Proxy support
-- [ ] Recording and playback
-- [ ] Headless mode toggle
+### Custom Browser Options
+
+Modify `internal/browser/browser.go`:
+
+```go
+opts := playwright.BrowserTypeLaunchOptions{
+    Headless: playwright.Bool(true),
+    SlowMo:   playwright.Float(50),
+}
+```
+
+### Proxy Configuration
+
+```go
+opts := playwright.BrowserTypeLaunchOptions{
+    Proxy: &playwright.BrowserTypeLaunchOptionsProxy{
+        Server: playwright.String("http://proxy:8080"),
+    },
+}
+```
+
+## API Costs
+
+Gemini Flash 2.0 (free tier):
+- Input: Free up to 1M tokens/day
+- Output: Free up to 32K tokens/day
+- This agent typically uses 2-5K tokens per task
+
+## Limitations
+
+- Visual CAPTCHA not supported
+- File downloads require manual handling
+- Multi-tab scenarios need explicit planning
+- JavaScript-heavy SPAs may need wait strategies
+
+## Development
+
+Run tests:
+```bash
+go test ./...
+```
+
+Build with debug info:
+```bash
+go build -race -o agent cmd/main.go
+```
+
+Enable verbose logging:
+```go
+log.SetLevel(log.DebugLevel)
+```
 
 ## License
 
-This is a prototype project for demonstration purposes.
-
-## Contributing
-
-This is a work trial project. Feedback and suggestions are welcome!
+MIT License - feel free to modify and distribute
 
 ## Support
 
-For issues or questions, please check the logs and ensure all dependencies are properly installed.
+For issues or questions:
+1. Check troubleshooting section
+2. Review execution logs
+3. Enable debug mode for detailed output
+
+---
+
+**Built with ❤️ using Go, Playwright, and Gemini AI**

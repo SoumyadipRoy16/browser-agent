@@ -1,42 +1,14 @@
-# Binaries for programs and plugins
+agent
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-browser-agent
-browser-agent.exe
-
-# Test binary, built with `go test -c`
 *.test
-
-# Output of the go coverage tool
 *.out
-
-# Dependency directories
-vendor/
-
-# Go workspace file
 go.work
-
-# IDE specific files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS specific files
-.DS_Store
-Thumbs.db
-
-# Log files
-*.log
-
-# Environment variables
+vendor/
 .env
-.env.local
-
-# Temporary files
-tmp/
-temp/
+.DS_Store
+screenshots/
+*.log
