@@ -298,3 +298,4 @@ For issues or questions:
 ---
 
 **Built with ❤️ using Go, Playwright, and Gemini AI**
+For issues or questions, please check the logs and ensure all dependencies are properly installed.
