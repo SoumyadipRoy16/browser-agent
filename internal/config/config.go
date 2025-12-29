@@ -10,16 +10,18 @@ type Config struct {
 	SlowMo        float64
 	MaxRetries    int
 	RetryDelay    time.Duration
+	EnableRecovery bool
 }
 
 func NewConfig() *Config {
 	return &Config{
-		MaxSteps:     100,
-		StepTimeout:  30 * time.Second,
-		TotalTimeout: 10 * time.Minute,
-		Headless:     false,
-		SlowMo:       100,
-		MaxRetries:   3,
-		RetryDelay:   2 * time.Second,
+		MaxSteps:      150,  // Increased for complex tasks
+		StepTimeout:   45 * time.Second,
+		TotalTimeout:  20 * time.Minute,  // Increased timeout
+		Headless:      false,
+		SlowMo:        100,
+		MaxRetries:    3,
+		RetryDelay:    2 * time.Second,
+		EnableRecovery: true,
 	}
 }

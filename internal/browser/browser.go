@@ -29,6 +29,9 @@ func NewBrowser(headless bool, slowMo float64) (*Browser, error) {
 	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
 		Headless: playwright.Bool(headless),
 		SlowMo:   playwright.Float(slowMo),
+		Args: []string{
+			"--disable-blink-features=AutomationControlled",
+		},
 	})
 	if err != nil {
 		pw.Stop()
@@ -49,6 +52,15 @@ func NewBrowser(headless bool, slowMo float64) (*Browser, error) {
 		pw.Stop()
 		return nil, fmt.Errorf("create page: %w", err)
 	}
+
+	// Add stealth scripts
+	page.AddInitScript(playwright.Script{
+		Content: playwright.String(`
+			Object.defineProperty(navigator, 'webdriver', {
+				get: () => undefined
+			});
+		`),
+	})
 
 	return &Browser{
 		pw:      pw,

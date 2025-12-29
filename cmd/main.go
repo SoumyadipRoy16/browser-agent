@@ -11,9 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: agent run \"<task description>\"")
-		fmt.Println("\nExample:")
-		fmt.Println("  agent run \"Go to amazon.com and search for laptops\"")
+		printUsage()
 		os.Exit(1)
 	}
 
@@ -31,11 +29,12 @@ func main() {
 	}
 
 	cfg := config.NewConfig()
-	
+
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
 		fmt.Println("Error: GEMINI_API_KEY environment variable not set")
-		fmt.Println("Get your free API key at: https://ai.google.dev")
+		fmt.Println("This should be your OpenRouter API key")
+		fmt.Println("Get your API key at: https://openrouter.ai/keys")
 		os.Exit(1)
 	}
 
@@ -46,7 +45,15 @@ func main() {
 	}
 	defer agent.Close()
 
-	fmt.Printf("\n🤖 Starting task: %s\n\n", taskDescription)
+	fmt.Printf("\n🤖 Advanced Browser Agent Starting...\n")
+	fmt.Printf("📋 Task: %s\n\n", taskDescription)
+	fmt.Printf("⚙️  Configuration:\n")
+	fmt.Printf("   Max Steps: %d\n", cfg.MaxSteps)
+	fmt.Printf("   Total Timeout: %v\n", cfg.TotalTimeout)
+	fmt.Printf("   Headless: %v\n", cfg.Headless)
+	fmt.Printf("   Recovery: %v\n\n", cfg.EnableRecovery)
+
+	fmt.Println("🚀 Starting execution...\n")
 
 	result, err := agent.ExecuteTask(taskDescription)
 	if err != nil {
@@ -54,12 +61,58 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n✅ Task completed successfully!\n")
-	fmt.Printf("\nSummary:\n")
-	fmt.Printf("  Steps executed: %d\n", result.StepsExecuted)
-	fmt.Printf("  Duration: %v\n", result.Duration)
-	if result.FinalState != "" {
-		fmt.Printf("  Final state: %s\n", result.FinalState)
+	fmt.Printf("\n" + strings.Repeat("=", 60) + "\n")
+	if result.Success {
+		fmt.Printf("✅ Task completed successfully!\n")
+	} else {
+		fmt.Printf("⚠️  Task completed with warnings\n")
 	}
+	fmt.Printf(strings.Repeat("=", 60) + "\n\n")
+
+	fmt.Printf("📊 Execution Summary:\n")
+	fmt.Printf("   Steps executed: %d\n", result.StepsExecuted)
+	fmt.Printf("   Duration: %v\n", result.Duration)
+	
+	if result.FinalState != "" {
+		fmt.Printf("   Final state: %s\n", result.FinalState)
+	}
+	
+	if result.Error != nil {
+		fmt.Printf("   Error: %v\n", result.Error)
+	}
+
+	if result.Memory != nil {
+		fmt.Printf("\n🧠 Memory Summary:\n")
+		fmt.Printf("   Products viewed: %d\n", len(result.Memory.ProductURLs))
+		if result.Memory.SelectedProduct != "" {
+			fmt.Printf("   Selected product: %s\n", result.Memory.SelectedProduct)
+		}
+		fmt.Printf("   Cart items: %d\n", len(result.Memory.CartItems))
+		if result.Memory.UserCredentials["email"] != "" {
+			fmt.Printf("   User authenticated: Yes\n")
+		}
+	}
+	
 	fmt.Println()
+}
+
+func printUsage() {
+	fmt.Println("Advanced Browser Agent - Complex E-commerce Automation")
+	fmt.Println("\nUsage: agent run \"<task description>\"")
+	fmt.Println("\nExamples:")
+	fmt.Println("  Simple:")
+	fmt.Println("    agent run \"Go to amazon.in and search for laptops\"")
+	fmt.Println("\n  Medium Complexity:")
+	fmt.Println("    agent run \"Search for wireless mouse on amazon.in, select the cheapest one and add to cart\"")
+	fmt.Println("\n  High Complexity (Full Checkout):")
+	fmt.Println("    agent run \"Go to amazon.in, search for headphones, select a product with good ratings, add to cart, and proceed to checkout\"")
+	fmt.Println("    agent run \"Buy a smartphone case from amazon.in, add to cart and go to payment screen\"")
+	fmt.Println("\nNote: The agent will:")
+	fmt.Println("  - Execute 30-50+ steps for complex tasks")
+	fmt.Println("  - Handle login when required (will prompt for credentials)")
+	fmt.Println("  - Fill address forms (will prompt for details)")
+	fmt.Println("  - Stop at payment screen (won't place actual orders)")
+	fmt.Println("  - Auto-recover from errors")
+	fmt.Println("\nEnvironment Variables:")
+	fmt.Println("  GEMINI_API_KEY - Your OpenRouter API key (required)")
 }
