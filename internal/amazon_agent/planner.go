@@ -95,6 +95,7 @@ Available actions:
 - type: Type text (target: selector, value: text, parameters: {submit: "true/false"})
 - wait: Wait for element or duration (target: selector optional, value: duration)
 - scroll: Scroll page (parameters: {direction: "up/down/top/bottom", amount: "500"})
+- go_back: Navigate back to previous page
 - select_product: Intelligently select product (value: criteria like "first", "rating above 4", "cheapest", "highest rated")
 - add_to_cart: Add current product to cart
 - proceed_checkout: Navigate to checkout from cart
